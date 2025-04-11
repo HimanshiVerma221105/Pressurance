@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Find Physiotherapists & Chiropractors</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background: #f6f9fc;
+      color: #333;
+    }
+    h2 { color: #1e3a8a; margin-bottom: 1rem; }
+    .container { max-width: 1000px; margin: auto; }
+    .search-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1rem;
+    }
+    .search-section input,
+    .search-section button,
+    .search-section select {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-right: 0.5rem;
+    }
+    .search-section button {
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .search-section button:hover { background: #3452c0; }
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-bottom: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .results-section {
+      margin-bottom: 1.5rem;
+    }
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card h3 { margin: 0; color: #1e3a8a; font-size: 1.1rem; }
+    .card p { margin: 0.3rem 0; color: #555; font-size: 0.95rem; }
+    .card a {
+      text-decoration: none;
+      color: #2563eb;
+      font-size: 0.9rem;
+      display: block;
+      margin-top: 0.4rem;
+    }
+    .card button {
+      margin-top: 0.6rem;
+      padding: 0.5rem;
+      border: none;
+      background: #16a34a;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .card button:hover { background: #15803d; }
+    details summary {
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0.5rem;
+      background: #e0e7ff;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🧍‍♂️ Find Physiotherapists Near You</h2>
+
+    <div class="search-section">
+      <label for="city">🌆 Search by city: </label>
+      <input type="text" id="city" placeholder="e.g. Delhi, Mumbai, Bangalore">
+      <button onclick="searchByCity()">Search</button>
+      <select id="sort">
+        <option value="">Sort by</option>
+        <option value="rating">Rating</option>
+        <option value="distance">Distance</option>
+      </select>
+      <div id="searchStatus" style="margin-top: 1rem; color: #666;">📍 Detecting your current location...</div>
+    </div>
+
+    <div id="map"></div>
+    <div id="history"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const FOURSQUARE_API_KEY = "fsq3ViXAv8Kobli6WOr/OwAGIp7Q1yzR9fqpeHjFX3e/wbI=";
+    let userCoords = null;
+    let map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    function searchByCity() {
+      const city = document.getElementById("city").value.trim();
+      if (!city) return alert("Please enter a city name.");
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`;
+
+      fetch(geocodeUrl)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length === 0) {
+            alert("City not found.");
+            return;
+          }
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          userCoords = { lat, lon };
+          fetchPhysios(city, lat, lon);
+        })
+        .catch(() => alert("Error finding city coordinates."));
+    }
+
+    async function fetchPhysios(cityLabel, lat, lon) {
+      const radius = 30000; // 30km radius
+      const url = `https://api.foursquare.com/v3/places/search?query=physiotherapist,chiropractor&ll=${lat},${lon}&radius=${radius}&limit=30`;
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          Authorization: FOURSQUARE_API_KEY
+        }
+      });
+      const data = await res.json();
+
+      if (!data.results.length) {
+        document.getElementById("searchStatus").innerText = `😓 No results found in ${cityLabel}`;
+        return;
+      }
+
+      const container = document.createElement("details");
+      container.open = true;
+      container.innerHTML = `<summary>📍 ${cityLabel} (${data.results.length} results)</summary><div class="results"></div>`;
+      const resultsDiv = container.querySelector(".results");
+
+      data.results.forEach(place => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const phone = place.tel || "Not available";
+        const address = place.location.formatted_address || "Address not available";
+        const placeUrl = `https://foursquare.com/v/${place.fsq_id}`;
+        const destLat = place.geocodes.main.latitude;
+        const destLon = place.geocodes.main.longitude;
+        const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
+
+        card.innerHTML = `
+          <h3>${place.name}</h3>
+          <p>📍 ${address}</p>
+          <p>☎️ ${phone}</p>
+          <a href="${directionsUrl}" target="_blank">🧭 Get Directions</a>
+          <a href="${place.website || '#'}" target="_blank">🌐 Visit Website</a>
+          <button onclick="alert('📅 Appointment request for ${place.name}')">📅 Book Appointment</button>
+        `;
+        resultsDiv.appendChild(card);
+
+        L.marker([destLat, destLon]).bindPopup(`<b>${place.name}</b><br>${address}`).addTo(map);
+      });
+
+      document.getElementById("history").prepend(container);
+      document.getElementById("searchStatus").innerText = `✅ Showing results for ${cityLabel}`;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        userCoords = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        };
+        fetchPhysios("Your Location", userCoords.lat, userCoords.lon);
+      }, () => {
+        document.getElementById("searchStatus").innerText = "📍 Location blocked. Please enter a city above.";
+      });
+    }
+  </script>
+</body>
+</html>
