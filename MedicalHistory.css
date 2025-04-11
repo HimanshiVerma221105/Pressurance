@@ -1,0 +1,143 @@
+/* MedicalHistory.css */
+:root {
+    --primary-color: #1e88e5;
+    --primary-dark: #1565c0;
+    --secondary-color: #2e7d32;
+    --text-color: #333333;
+    --light-gray: #f5f5f5;
+    --border-color: #e0e0e0;
+    --error-color: #d32f2f;
+  }
+  
+  .medical-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f7ff;
+    padding: 20px;
+  }
+  
+  .medical-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 700px;
+    padding: 30px;
+  }
+  
+  .medical-header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  
+  .medical-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+  
+  .medical-header p {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .medical-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .condition-section {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #fafafa;
+  }
+  
+  .condition-section h3 {
+    color: var(--primary-dark);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+  }
+  
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .checkbox-label:hover {
+    background-color: #e3f2fd;
+  }
+  
+  .checkbox-label input {
+    margin-right: 8px;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  
+  .submit-button {
+    flex: 1;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .cancel-button {
+    background-color: white;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cancel-button:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .medical-card {
+      padding: 20px;
+    }
+    
+    .checkbox-group {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+  }

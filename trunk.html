@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Head View</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #3066BE;
+      --primary-dark: #2854A1;
+      --secondary: #00B4D8;
+      --accent: #FF5F5D;
+      --accent-hover: #FF7775;
+      --light-bg: #F0F7FF;
+      --white: #FFFFFF;
+      --text-dark: #1A2A3A;
+      --text-medium: #455A70;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--light-bg) 0%, #E6F0FF 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header, footer {
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      color: var(--white);
+      padding: 18px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      font-size: 1.8em;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
+    footer {
+      font-size: 1em;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-weight: 500;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      box-sizing: border-box;
+      transition: transform 0.3s ease;
+    }
+
+    footer:hover {
+      transform: translateY(-3px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 32px 0;
+    }
+
+    /* Subtle shimmer effect for the header */
+    @keyframes shimmer {
+      0% { background-position: -100% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    header {
+      background-size: 200% 100%;
+      animation: shimmer 8s ease-in-out infinite;
+    }
+
+    /* Heart beat animation for footer */
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    footer .heart {
+      display: inline-block;
+      transform-origin: center;
+      animation: heartbeat 1.5s infinite;
+      color: var(--accent);
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>Pressurance – Trunk Region</header>
+
+  <!-- Tooltip -->
+  <div id="tooltip" style="
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    pointer-events: none;
+    display: none;
+    z-index: 100;
+  "></div>
+
+  <script type="module" src="./src/trunkView.js"></script>
+
+  <footer>Made with ❤️ by Team Pressurance</footer>
+</body>
+</html>
